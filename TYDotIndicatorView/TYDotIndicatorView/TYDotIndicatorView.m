@@ -9,15 +9,14 @@
 #import "TYDotIndicatorView.h"
 
 static const NSUInteger dotNumber = 3;
-static const NSInteger dotTag = 3;
 static const CGFloat dotSeparatorDistance = 12.0f;
 
 @interface TYDotIndicatorView ()
 
 @property (nonatomic, assign) TYDotIndicatorViewStyle dotStyle;
-@property (nonatomic, assign) BOOL animating;
 @property (nonatomic, assign) CGSize dotSize;
-@property (nonatomic, retain) UIColor *dotColor;
+@property (nonatomic, retain) NSMutableArray *dots;
+@property (nonatomic, assign) BOOL animating;
 
 @end
 
@@ -33,30 +32,34 @@ static const CGFloat dotSeparatorDistance = 12.0f;
     if (self)
     {
         _dotStyle = style;
-        _dotColor = dotColor;
         _dotSize = dotSize;
         
-        CGFloat xPos = CGRectGetWidth(frame) / 2 - dotSize.width - dotSeparatorDistance;
-        CGFloat yPos = CGRectGetHeight(frame) / 2;
+        _dots = [[NSMutableArray alloc] init];
+        
+        CGFloat xPos = CGRectGetWidth(frame) / 2 - dotSize.width * 3 / 2 - dotSeparatorDistance;
+        CGFloat yPos = CGRectGetHeight(frame) / 2 - _dotSize.height / 2;
+        
         for (int i = 0; i < dotNumber; i++)
         {
-            UIImageView *dot = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, dotSize.width, dotSize.height)];
-            dot.center = CGPointMake(xPos + i * (dotSeparatorDistance + dotSize.width), yPos);
-            dot.image = [self createDotImage];
-            dot.alpha = 1 - 0.3 * i;
-            dot.tag = dotTag + i;
-            [self addSubview:dot];
+            CAShapeLayer *dot = [CAShapeLayer new];
+            dot.path = [self createDotPath].CGPath;
+            dot.frame = CGRectMake(xPos, yPos, _dotSize.width, _dotSize.height);
+            dot.opacity = 0.3 * i;
+            dot.fillColor = dotColor.CGColor;
+            
+            [self.layer addSublayer:dot];
+            
+            [_dots addObject:dot];
+            
+            xPos = xPos + (dotSeparatorDistance + _dotSize.width);
         }
 
     }
     return self;
 }
 
-- (UIImage *)createDotImage
+- (UIBezierPath *)createDotPath
 {
-    UIGraphicsBeginImageContextWithOptions(self.dotSize, NO, 0);
-    [self.dotColor setFill];
-    
     CGFloat cornerRadius = 0.0f;
     if (_dotStyle == TYDotIndicatorViewStyleSquare)
     {
@@ -72,13 +75,8 @@ static const CGFloat dotSeparatorDistance = 12.0f;
     }
     
     UIBezierPath *bezierPath = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, self.dotSize.width, self.dotSize.height) cornerRadius:cornerRadius];
-    [bezierPath fill];
     
-    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-    
-    UIGraphicsEndImageContext();
-    
-    return image;
+    return bezierPath;
 }
 
 - (CAAnimation *)fadeInAnimation:(CFTimeInterval)delay
@@ -99,22 +97,27 @@ static const CGFloat dotSeparatorDistance = 12.0f;
     {
         return;
     }
-    
-    for (int i = 0; i < dotNumber; i++)
+
+    for (int i = 0; i < _dots.count; i++)
     {
-        UIView *dot = [self viewWithTag:dotTag + i];
-        [dot.layer addAnimation:[self fadeInAnimation:i * 0.4] forKey:@"fadeIn"];
+        [_dots[i] addAnimation:[self fadeInAnimation:i * 0.4] forKey:@"fadeIn"];
     }
+    
     _animating = YES;
 }
 
 - (void)stopAnimating
 {
-    for (int i = 0; i < dotNumber; i++)
+    if (!_animating)
     {
-        UIView *dot = [self viewWithTag:dotTag + i];
-        [dot.layer removeAllAnimations];
+        return;
     }
+    
+    for (int i = 0; i < _dots.count; i++)
+    {
+        [_dots[i] addAnimation:[self fadeInAnimation:i * 0.4] forKey:@"fadeIn"];
+    }
+    
     _animating = NO;
 }
 
@@ -126,6 +129,7 @@ static const CGFloat dotSeparatorDistance = 12.0f;
 - (void)removeFromSuperview
 {
     [self stopAnimating];
+    
     [super removeFromSuperview];
 }
 

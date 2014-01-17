@@ -53,11 +53,10 @@
     UILabel *dotLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 510, 320, 22)];
     dotLabel.backgroundColor = [UIColor clearColor];
     dotLabel.textAlignment = NSTextAlignmentCenter;
-    dotLabel.font = [UIFont fontWithName:@"MarkerFelt-Wide" size:18];
+    dotLabel.font = [UIFont fontWithName:@"HelveticaNeue-UltraLightItalic" size:18];
     dotLabel.textColor = [UIColor orangeColor];
     dotLabel.text = @"TYDotIndicatorView";
     [self.view addSubview:dotLabel];
-
 }
 
 - (void)didReceiveMemoryWarning

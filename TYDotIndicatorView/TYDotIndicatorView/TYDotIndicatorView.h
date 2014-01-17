@@ -17,6 +17,8 @@ typedef NS_ENUM(NSInteger, TYDotIndicatorViewStyle)
 
 @interface TYDotIndicatorView : UIView
 
+@property (nonatomic, assign) BOOL hidesWhenStopped;
+
 - (id)initWithFrame:(CGRect)frame
            dotStyle:(TYDotIndicatorViewStyle)style
            dotColor:(UIColor *)dotColor

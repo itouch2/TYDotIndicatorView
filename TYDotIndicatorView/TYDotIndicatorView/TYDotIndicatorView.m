@@ -33,6 +33,7 @@ static const CGFloat dotSeparatorDistance = 12.0f;
     {
         _dotStyle = style;
         _dotSize = dotSize;
+        _hidesWhenStopped = YES;
         
         _dots = [[NSMutableArray alloc] init];
         
@@ -119,6 +120,16 @@ static const CGFloat dotSeparatorDistance = 12.0f;
     }
     
     _animating = NO;
+    
+    if (_hidesWhenStopped)
+    {
+        // fade in to disappear
+        [UIView animateWithDuration:0.2 animations:^{
+            self.alpha = 0.0f;
+        } completion:^(BOOL finished) {
+            [self removeFromSuperview];
+        }];
+    }
 }
 
 - (BOOL)isAnimating

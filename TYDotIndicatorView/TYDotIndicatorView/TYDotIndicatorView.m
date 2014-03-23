@@ -45,7 +45,7 @@ static const CGFloat dotSeparatorDistance = 12.0f;
             CAShapeLayer *dot = [CAShapeLayer new];
             dot.path = [self createDotPath].CGPath;
             dot.frame = CGRectMake(xPos, yPos, _dotSize.width, _dotSize.height);
-            dot.opacity = 0.3 * i;
+            dot.opacity = 0.3 * (dotNumber - i);
             dot.fillColor = dotColor.CGColor;
             
             [self.layer addSublayer:dot];
@@ -85,8 +85,8 @@ static const CGFloat dotSeparatorDistance = 12.0f;
     CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"opacity"];
     animation.fromValue = @(0.3f);
     animation.toValue = @(1.0f);
-    animation.duration = 0.9f;
-    animation.beginTime = delay;
+    animation.duration = 0.8f;
+    animation.beginTime = CACurrentMediaTime() + delay;
     animation.autoreverses = YES;
     animation.repeatCount = HUGE_VAL;
     return animation;
@@ -101,7 +101,7 @@ static const CGFloat dotSeparatorDistance = 12.0f;
 
     for (int i = 0; i < _dots.count; i++)
     {
-        [_dots[i] addAnimation:[self fadeInAnimation:i * 0.4] forKey:@"fadeIn"];
+        [_dots[i] addAnimation:[self fadeInAnimation:i * 0.25] forKey:@"fadeIn"];
     }
     
     _animating = YES;
@@ -123,7 +123,7 @@ static const CGFloat dotSeparatorDistance = 12.0f;
     
     if (_hidesWhenStopped)
     {
-        // fade in to disappear
+        // fade out to disappear
         [UIView animateWithDuration:0.2 animations:^{
             self.alpha = 0.0f;
         } completion:^(BOOL finished) {
